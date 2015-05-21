@@ -8,7 +8,7 @@
 #include <Parser.h>
 #include <Logger.h>
 #include <Pins.h>
-#include <PrintSerial.h>
+#include <ScheduleRunner.h>
 #include <SketchThread.h>
 #include <SerialBuffer.h>
 #include <Clock.h>
@@ -36,9 +36,8 @@ int main(void)
   // Announce
   cerr << "NCORE: Arduino Native Core" << endl << "Copyright (C) 2011 maniacbug@ymail.com GPLv2" << endl << endl;
 
-
   // Command Shell
-  PrintSerial shell(&theScheduler);
+  ScheduleRunner shell(&theScheduler);
 
   // Add commands for all of the objects that can dispatch commands
   theDispatcher.add(&theLogger);

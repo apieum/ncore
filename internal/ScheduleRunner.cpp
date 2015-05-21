@@ -5,7 +5,7 @@
 // Project includes
 #include <Dispatcher.h>
 #include <Clock.h>
-#include <PrintSerial.h>
+#include <ScheduleRunner.h>
 
 /****************************************************************************/
 
@@ -13,14 +13,14 @@ using namespace std;
 
 /****************************************************************************/
 
-void PrintSerial::run(const Dispatcher& _commands)
+void ScheduleRunner::run(const Dispatcher& _commands)
 {
   run(_commands, Clock());
 }
 
 /****************************************************************************/
 
-void PrintSerial::run(const Dispatcher& _commands, const Clock& _clock)
+void ScheduleRunner::run(const Dispatcher& _commands, const Clock& _clock)
 {
   while ( remaining_schedule && remaining_schedule->size() )
   {
