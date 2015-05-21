@@ -112,18 +112,21 @@ int Logger::lines_contain(const std::string& value) const
 
 void Logger::internal(const std::string& module, const std::string& format,...)
 {
-  pthread_mutex_lock( &mutex );
+  if ( verbose )
+  {
+    pthread_mutex_lock( &mutex );
 
-  va_list ap;
-  va_start(ap,format);
-  vsnprintf(buffer,sizeof(buffer),format.c_str(),ap);
-  va_end(ap);
+    va_list ap;
+    va_start(ap,format);
+    vsnprintf(buffer, sizeof(buffer), format.c_str(), ap);
+    va_end(ap);
 
-  string preamble = string("IN ") + module + "    ";
-  preamble.resize(7);
-  add_buffer(preamble);
+    string preamble = string("IN ") + module + "    ";
+    preamble.resize(7);
+    add_buffer(preamble);
 
-  pthread_mutex_unlock( &mutex );
+    pthread_mutex_unlock( &mutex );
+  }
 }
 
 /****************************************************************************/
@@ -131,15 +134,21 @@ void Logger::internal(const std::string& module, const std::string& format,...)
 void Logger::sketch(const std::string& module, const std::string& format,...)
 {
   pthread_mutex_lock( &mutex );
-
   va_list ap;
   va_start(ap,format);
-  vsnprintf(buffer,sizeof(buffer),format.c_str(),ap);
+  if ( verbose )
+  {
+    vsnprintf(buffer, sizeof(buffer), format.c_str(), ap);
+    string preamble = string("SK ") + module + "    ";
+    preamble.resize(7);
+    add_buffer(preamble);
+  }
+  else if ( module == "SERL" )
+  {
+    vsnprintf(buffer, sizeof(buffer), format.c_str(), ap);
+    add_message("", buffer);
+  }
   va_end(ap);
-
-  string preamble = string("SK ") + module + "    ";
-  preamble.resize(7);
-  add_buffer(preamble);
 
   pthread_mutex_unlock( &mutex );
 
@@ -151,13 +160,17 @@ void Logger::sketch(const std::string& module, const std::string& format,...)
 void Logger::sketch_v(const std::string& module, const std::string& format, va_list ap)
 {
   pthread_mutex_lock( &mutex );
-
-  vsnprintf(buffer,sizeof(buffer),format.c_str(),ap);
-
-  string preamble = string("SK ") + module + "    ";
-  preamble.resize(7);
-  add_buffer(preamble);
-
+  if ( verbose )
+  {
+    vsnprintf(buffer, sizeof(buffer), format.c_str(), ap);
+    string preamble = string("SK ") + module + "    ";
+    preamble.resize(7);
+    add_buffer(preamble);
+  } else if ( module == "SERL" )
+  {
+    vsnprintf(buffer, sizeof(buffer), format.c_str(), ap);
+    add_message("", buffer);
+  }
   pthread_mutex_unlock( &mutex );
 
   throttle_output_rate();
@@ -167,6 +180,12 @@ void Logger::sketch_v(const std::string& module, const std::string& format, va_l
 
 void Logger::add_message(const std::string& preamble,const std::string& message)
 {
+  if ( ! verbose )
+  {
+    cout << message << endl ;
+    return;
+  }
+
   ostringstream ss;
   ss << "NCORE: ";
   if (clock)
@@ -174,10 +193,6 @@ void Logger::add_message(const std::string& preamble,const std::string& message)
   if (preamble.size())
     ss << preamble << " ";
   ss << message << endl;
-
-  if ( verbose )
-    cout << ">" << ss.str() ;
-
   push_back(ss.str());
 }
 
@@ -185,25 +200,28 @@ void Logger::add_message(const std::string& preamble,const std::string& message)
 
 void Logger::add_buffer(const std::string& preamble)
 {
-  add_message(preamble,string(buffer));
+  add_message(preamble, string(buffer));
 }
 
 /****************************************************************************/
 
 void Logger::add(const std::string& format,...)
 {
-  pthread_mutex_lock( &mutex );
+  if ( verbose )
+  {
+    pthread_mutex_lock( &mutex );
 
-  va_list ap;
-  va_start(ap,format);
-  vsnprintf(buffer,sizeof(buffer),format.c_str(),ap);
-  va_end(ap);
+    va_list ap;
+    va_start(ap,format);
+    vsnprintf(buffer,sizeof(buffer),format.c_str(),ap);
+    va_end(ap);
 
-  add_buffer(string());
+    add_buffer(string());
 
-  pthread_mutex_unlock( &mutex );
+    pthread_mutex_unlock( &mutex );
 
-  throttle_output_rate();
+    throttle_output_rate();
+  }
 }
 
 /****************************************************************************/
@@ -282,7 +300,7 @@ bool Logger::command_list(const vector<string>& _commands) const
     if (operand.at(0) == '/' && operand.at(operand.size()-1) == '/')
     {
       string pattern = operand.substr(1,operand.size()-2);
-      
+
       pthread_mutex_lock( const_cast<pthread_mutex_t*>(&mutex) );
       remove_copy_if(begin(),end(),ostream_iterator<string>(cout,""),not_matches(pattern));
       pthread_mutex_unlock( const_cast<pthread_mutex_t*>(&mutex) );
