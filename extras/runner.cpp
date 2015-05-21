@@ -34,7 +34,10 @@ WireQueue theWireQueue(theLogger);
 int main(void)
 {
   // Announce
-  cerr << "NCORE: Arduino Native Core" << endl << "Copyright (C) 2011 maniacbug@ymail.com GPLv2" << endl << endl;
+  // cerr << "NCORE: Arduino Native Core" << endl << "Copyright (C) 2011 maniacbug@ymail.com GPLv2" << endl << endl;
+
+  // scheduled commands:
+  theScheduler.add(1000, "list");
 
   // Command Shell
   ScheduleRunner shell(&theScheduler);
