@@ -169,8 +169,10 @@ template <> bool isMoreOrEqual<const char*>(const char* const &a, const char* co
 #define testing(name) struct test_ ## name : Test { test_ ## name() : Test(#name) {}; void loop(); } test_ ## name ## _instance; void test_ ## name :: loop()
 #define externTesting(name) struct test_ ## name : Test { test_ ## name(); void loop(); }; extern test_##name test_##name##_instance
 
-
-#define assertOp(arg1,op,op_name,arg2) if (!Test::assertion<__typeof__(arg2)>(__FILE__,__LINE__,#arg1,(arg1),op_name,op,#arg2,(arg2))) return;
+#ifdef __GNUC__
+  #define typeof __typeof__
+#endif
+#define assertOp(arg1,op,op_name,arg2) if (!Test::assertion<typeof(arg2)>(__FILE__,__LINE__,#arg1,(arg1),op_name,op,#arg2,(arg2))) return;
 #define assertEqual(arg1,arg2)       assertOp(arg1,isEqual,"==",arg2)
 #define assertNotEqual(arg1,arg2)    assertOp(arg1,isNotEqual,"!=",arg2)
 #define assertLess(arg1,arg2)        assertOp(arg1,isLess,"<",arg2)
