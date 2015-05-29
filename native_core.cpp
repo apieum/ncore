@@ -20,11 +20,11 @@ extern Clock theClock;
 
 extern "C" {
 
-void __cxa_pure_virtual()
-{
-  theLogger.sketch("CORE","SYSTEM HALT -- cxa_pure_virtual");
-  while (1) {}
-}
+// void __cxa_pure_virtual()
+// {
+//   theLogger.sketch("CORE","SYSTEM HALT -- cxa_pure_virtual");
+//   while (1) {}
+// }
 
 //
 // Clock
