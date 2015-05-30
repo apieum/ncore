@@ -1,6 +1,5 @@
 #ifndef Arduino_h
 #define Arduino_h
-#define __AVR_ATmega328P__
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
