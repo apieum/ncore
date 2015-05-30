@@ -72,11 +72,6 @@ void pinMode(uint8_t pin,uint8_t mode)
   thePins.pinMode(pin,mode);
 }
 
-void pinSymbol(uint8_t pin,const char* label)
-{
-  thePins.pinSymbol(pin,label);
-}
-
 void attachInterrupt(uint8_t num, void (*fn)(void), int)
 {
   thePins.attachInterrupt(num,fn);
@@ -125,32 +120,16 @@ void printf_P(const char* format,...)
 
 unsigned long pulseIn(uint8_t pin, uint8_t /*state*/, unsigned long /*timeout*/ )
 {
-  theLogger.sketch("CORE","%i: pulseIn 1000",pin);
+  theLogger.sketch("CORE", "%i: pulseIn 1000", pin);
 
   return 1000LU;
 }
 
-void analogWrite(uint8_t pin,int level)
+void analogWrite(uint8_t pin, int level)
 {
-  theLogger.sketch("PINS","%i: %i",pin,level);
-}
-
-void fdevopen(int (*)(char, FILE*),int)
-{
+  theLogger.sketch("PINS", "%i: %i",pin,level);
 }
 
 }
-
-void tone(uint8_t pin, unsigned int what, unsigned long wait)
-{
-  theLogger.sketch("PINS","%i: tone %u",pin,what);
-  delay(wait);
-}
-
-void noTone(uint8_t pin)
-{
-  theLogger.sketch("PINS","%i: noTone",pin);
-}
-
 // vim:cin:ai:sts=2 sw=2 ft=cpp
 
